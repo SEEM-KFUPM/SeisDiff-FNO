@@ -49,7 +49,7 @@ For set up the environment and install the dependency packages, please run the f
 
 The training data preparation workflow can be divided into three steps:
 
-1. **Downloading and generating the synthetic seismic dataset:** We use the synthetic seismic modeling framework developed by [Li et al. (2021)]([https://ieeexplore.ieee.org/document/9507514](https://github.com/JintaoLee-Roger/SeismicSuperResolution)) to generate paired low-resolution (LR) and high-resolution (HR) seismic sections. The original dataset consists of 3,200 paired 2D slices derived from 800 synthetic 3D reflectivity volumes with varying fold intensity, fault density, reflector geometry, peak frequencies, and noise levels.
+1. **Downloading and generating the synthetic seismic dataset:** We use the synthetic seismic modeling framework developed by [Li et al. (2021)]([https://ieeexplore.ieee.org/document/9507514](https://github.com/JintaoLee-Roger/SeismicSuperResolution) to generate paired low-resolution (LR) and high-resolution (HR) seismic sections. The original dataset consists of 3,200 paired 2D slices derived from 800 synthetic 3D reflectivity volumes with varying fold intensity, fault density, reflector geometry, peak frequencies, and noise levels.
 
 2. **Geophysically informed data augmentation:** To expand the dataset from 3,200 to 10,000 samples, we apply a series of physically consistent transformations to the LR sections, including:
    - Horizontal flipping
@@ -109,7 +109,7 @@ The training process can be divided into 4 steps:
 
 ## How to Run the Training Code?
 
-1. **Step 1: Obtain the dataset:** Download and generate the synthetic seismic dataset following [Li et al. (2021)]([https://ieeexplore.ieee.org/document/9507514](https://github.com/JintaoLee-Roger/SeismicSuperResolution)). The original 3,200 LR-HR pairs serve as the base.
+1. **Step 1: Obtain the dataset:** Download and generate the synthetic seismic dataset following [Li et al. (2021)](https://github.com/JintaoLee-Roger/SeismicSuperResolution). The original 3,200 LR-HR pairs serve as the base.
 
 2. **Step 2: Run data augmentation:** Apply the geophysically informed augmentation pipeline to expand the dataset to 10,000 samples. Save the augmented pairs as `.npy` files.
 
