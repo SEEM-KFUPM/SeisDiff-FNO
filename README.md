@@ -36,15 +36,6 @@ BibTeX
       publisher={IEEE}
     }
 
-## Install
-
-For set up the environment and install the dependency packages, please run the following script:
-
-    conda create -n SeisDiff python=3.10
-    conda activate SeisDiff
-    conda install ipython notebook
-    pip install torch==2.1.0 numpy==1.26.0 matplotlib==3.8.0 scikit-image==0.22.0 scipy==1.11.0
-
 ## Data Preparation
 
 The training data preparation workflow can be divided into three steps:
