@@ -3,92 +3,6 @@ from torch import nn
 import torchvision.transforms.functional as FV
 import torch.nn.functional as F
 
-def sinc_interpolation(data: torch.Tensor, 
-                              target_size: tuple = None,
-                              scale_factor: float = None) -> torch.Tensor:
-    """
-    Sinc interpolation via zero-padding in Fourier domain.
-    Input:  torch.Tensor (B, C, H, W) or (C, H, W) or (H, W)
-    
-    Args:
-        target_size:  (H_out, W_out) — tamaño objetivo explícito
-        scale_factor: float — factor de escala (e.g. 2.0, 0.5, 1.0)
-        
-    One of target_size or scale_factor must be provided.
-    Output: same rank, spatial dims as specified
-    """
-    assert target_size is not None or scale_factor is not None, \
-        "Must provide either target_size or scale_factor"
-
-    original_ndim = data.ndim
-    device = data.device
-    dtype  = data.dtype
-
-    # ── Extract 2D slice ──
-    if data.ndim == 4:
-        B, C, H, W = data.shape
-        data_2d = data[0, 0]
-    elif data.ndim == 3:
-        C, H, W = data.shape
-        data_2d = data[0]
-    elif data.ndim == 2:
-        H, W = data.shape
-        data_2d = data
-    else:
-        raise ValueError(f"Unexpected shape: {data.shape}")
-
-    # ── Compute target dimensions ──
-    if target_size is not None:
-        H_out, W_out = target_size
-    else:
-        H_out = int(H * scale_factor)
-        W_out = int(W * scale_factor)
-
-    # ── Save statistics ──
-    original_mean = data_2d.mean()
-    original_std  = data_2d.std()
-
-    # ── Forward FFT ──
-    F = torch.fft.fft2(data_2d.to(torch.complex64))
-    F_shifted = torch.fft.fftshift(F)
-
-    # ── Pad or crop in frequency domain ──
-    F_out = torch.zeros((H_out, W_out), dtype=torch.complex64, device=device)
-
-    # How much of the original spectrum fits in the output
-    H_copy = min(H, H_out)
-    W_copy = min(W, W_out)
-
-    # Source region (center of original spectrum)
-    h_src_start = H // 2 - H_copy // 2
-    w_src_start = W // 2 - W_copy // 2
-
-    # Destination region (center of output spectrum)
-    h_dst_start = H_out // 2 - H_copy // 2
-    w_dst_start = W_out // 2 - W_copy // 2
-
-    F_out[h_dst_start:h_dst_start + H_copy,
-          w_dst_start:w_dst_start + W_copy] = \
-    F_shifted[h_src_start:h_src_start + H_copy,
-              w_src_start:w_src_start + W_copy]
-
-    # ── Inverse FFT ──
-    F_unshifted = torch.fft.ifftshift(F_out)
-    data_interp = torch.fft.ifft2(F_unshifted).real
-
-    # ── Rescale to preserve original statistics ──
-    data_interp = data_interp - data_interp.mean()
-    data_interp = data_interp / (data_interp.std() + 1e-8)
-    data_interp = data_interp * original_std + original_mean
-
-    # ── Restore original rank ──
-    if original_ndim == 4:
-        data_interp = data_interp.unsqueeze(0).unsqueeze(0)
-    elif original_ndim == 3:
-        data_interp = data_interp.unsqueeze(0)
-
-    return data_interp.to(dtype)
-
 def space_to_depth(x, size=2):
     """
     Downsacle method that use the depth dimension to
@@ -272,11 +186,11 @@ class ResnetBlock(nn.Module):
 
 
         if cond is not None:
-            # cond = FV.resize(
-            #     cond,
-            #     (x.shape[2], x.shape[3]),
-            #     interpolation=FV.InterpolationMode.BILINEAR,
-            # )
+            cond = FV.resize(
+                cond,
+                (x.shape[2], x.shape[3]),
+                interpolation=FV.InterpolationMode.BILINEAR,
+            )
             cond = self.extra_in_conv(cond)
             cond = self.extra_in_FNO(cond)
 
@@ -369,10 +283,6 @@ class DiffusionFNOUnet(nn.Module):
 
     def forward(self, x, cond, time):
         x = self.init_conv(x)
-        cond = sinc_interpolation(cond,
-                                      target_size=(x.shape[2],
-                                                   x.shape[3])
-                                     )
         cond = self.cond_proj(cond)  # Project conditional input
         init_result = x.clone()
         t = self.time_mlp(time)
