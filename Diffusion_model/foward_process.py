@@ -44,43 +44,6 @@ def sample_q(x0, t, schedule, noise=None, gamma=2, noise_perturb=0, add_random_n
 
     return x_t, w_t
 
-# def sample_q(x0, t, noise=None, gamma=2, noise_perturb=0, add_random_noise=False):
-#     """
-#     Hybrid noise schedule with controlled randomness.
-#     """
-#     device = x0.device  # Use the device of the input tensor
-    
-#     if noise is None:
-#         noise = torch.randn_like(x0, device=device)  # Standard Gaussian noise on correct device
-#     # Compute cosine noise schedule inside the function
-#     num_timesteps = 1000 # Adjust if needed
-#     betas_t = cosine_schedule(num_timesteps).to(device)  # Ensure schedule is on correct device
-#     alphas_t = 1.0 - betas_t
-#     alphas_bar_t = torch.cumprod(alphas_t, dim=0)  # Compute cumulative product
-
-#     # Ensure t is on the same device
-#     t = t.to(device)
-    
-#     # Sample alpha values for current t
-#     sqrt_alphas_bar_t_sampled = torch.sqrt(alphas_bar_t[t])
-#     sqrt_1_minus_alphas_bar_t_sampled = torch.sqrt(1.0 - alphas_bar_t[t])
-    
-#     # Introduce slight randomness to noise variance
-#     perturb_factor = 1.0 + noise_perturb * torch.randn_like(sqrt_1_minus_alphas_bar_t_sampled, device=device)
-#     sqrt_1_minus_alphas_bar_t_sampled *= perturb_factor
-    
-#     # Generate noisy sample
-#     x_t = sqrt_alphas_bar_t_sampled * x0 + sqrt_1_minus_alphas_bar_t_sampled * noise
-    
-#     # Option to add random noise at each step
-#     if add_random_noise:
-#         x_t += torch.randn_like(x_t, device=device) * torch.sqrt(1 - alphas_bar_t[t])
-    
-#     # Compute SNR for Min-SNR weighting
-#     snr_t = (alphas_bar_t[t]) / (1 - alphas_bar_t[t] + 1e-20)
-#     w_t = torch.minimum(torch.tensor(gamma, device=device) / snr_t, torch.tensor(1.0, device=device))
-    
-#     return x_t, w_t
 
 def get_noisy_seismic(x0, t, schedule):
     """
