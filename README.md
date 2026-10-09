@@ -29,8 +29,7 @@ BibTeX
       title={SeisDiff-FNO: Seismic Data Enhancement Using Fourier Neural Operators within a Conditional Diffusion Framework},
       author={Traversa, Alessandro and Waheed, Umair Bin and AlAli, Abdulmohsen and Alkhalifah, Tariq A.},
       journal={Artificial Intelligence in Geosciences},
-      year={2026},
-      note={Under review}
+      year={2026}
     }
 
 ## Data Preparation
